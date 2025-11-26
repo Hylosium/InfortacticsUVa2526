@@ -1,0 +1,7 @@
+# Evitar que la conf de IntelIJ estorbe en Git.
+.idea/
+*.iml
+
+# Archivos compilados (basura)
+*.class
+out/
