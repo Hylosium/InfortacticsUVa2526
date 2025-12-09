@@ -4,8 +4,8 @@ public class Assets {
 	static final int BOARD_ROWS = 6;
 	static final int BOARD_COLUMNS = 6;
 	static final int INITIAL_ELIXIR = 8;
-	static final char NO_POSITION = '░';
-	static final int MAX_TURNS = 10;
+    static final char NO_POSITION = '░';
+    static final int MAX_TURNS = 10;
 	
 	static final String ARCHER_NAME = "Arquera";
 	static final char ARCHER_SYMBOL = 'A';
