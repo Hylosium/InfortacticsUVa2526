@@ -1,12 +1,8 @@
----
-creation date: 2025-11-19T17:29
-modification date: 2025-11-26T23:09
----
-## jQuery UI v1.13.2
+## jQuery UI v1.14.1
 
 ### jQuery UI License
 ```
-Copyright jQuery Foundation and other contributors, https://jquery.org/
+Copyright OpenJS Foundation and other contributors, https://openjsf.org/
 
 This software consists of voluntary contributions made by many
 individuals. For exact contribution history, see the revision history
