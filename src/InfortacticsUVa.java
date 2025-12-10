@@ -210,6 +210,15 @@ public class InfortacticsUVa {
     /**
      * Método auxiliar para imprimir una fila de estadísticas con formato.
      */
+    /*
+    // EXPLICACIÓN DEL FORMATO printf:
+       "%-12s" -> Columna 1 (Nombre): Reserva 12 huecos, alinea a la izquierda (String).
+       "%-7c"  -> Columna 2 (Símbolo): Reserva 7 huecos, alinea a la izquierda (Char).
+       "%-7d"  -> Columna 3 (Elixir):  Reserva 7 huecos, alinea a la izquierda (Entero).
+       "%-9d"  -> Columna 4 (Ataque):  Reserva 9 huecos, alinea a la izquierda (Entero).
+       "%-9d"  -> Columna 5 (Defensa): Reserva 9 huecos, alinea a la izquierda (Entero).
+       "%n"    -> Salto de línea final.
+    * */
     public static void printStatRow(String name, char symbol, int elixir, int attack, int defense) {
         System.out.printf("%-12s %-7c %-7d %-9d %-9d%n", name, symbol, elixir, attack, defense);
     }
