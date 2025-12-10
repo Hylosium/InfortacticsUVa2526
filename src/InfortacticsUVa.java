@@ -1,41 +1,35 @@
 import java.io.File;
-import java.util.Scanner;
-// Importar librerías necesarias para ficheros.
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 /**
  * Clase principal del juego InforTactics UVa.
+ * Gestiona el menú principal, la persistencia de datos y el flujo general de la aplicación.
  */
 public class InfortacticsUVa {
 
     /**
      * Método principal de la aplicación.
-     * Inicializa las variables, gestiona el bucle del menú principal y redirige a las diferentes opciones.
+     * @param args Argumentos de la línea de comandos.
      */
     public static void main(String[] args) {
         // 1. PREPARACIÓN DE DATOS
-        // Inicializar Scanner.
         Scanner in = new Scanner(System.in);
-        // Cantidad de elixir.
         int elixirRestante = Assets.INITIAL_ELIXIR;
-        // Se definen los strings con la cantidad de "INITIAL_ELIXIR" por escalabilidad en el futuro.
-        // Si cambias la constante en Assets.java se replica aquí también.
 
-        // Definir vector de Strings para baraja del Jugador (inicializar a INITIAL_ELIXIR)
         String[] playerDeck = new String[Assets.INITIAL_ELIXIR];
-        // Definir vector de Strings para baraja del Enemigo (inicializar a INITIAL_ELIXIR)
         String[] enemyDeck = new String[Assets.INITIAL_ELIXIR];
+
         for (int i = 0; i < playerDeck.length; i++){
             playerDeck[i]="";
             enemyDeck[i]="";
         }
 
         // 2. BUCLE DEL MENÚ PRINCIPAL
-        // Crear bucle (while) que se repita hasta que el usuario elija "Salir"
-        boolean salir=false;
-        // 2.1 MOSTRAR INTERFAZ
-        // Mostrar las 5 opciones del menú por pantalla (Imagen 2)
-        // Pedir opción al usuario. Validar que sea correcta; si no, mensaje error y repetir.
+        boolean salir = false;
+
         do{
             System.out.println("🏰  InforTactics UVa  🏰");
             System.out.println(".______________________.");
@@ -48,38 +42,31 @@ public class InfortacticsUVa {
 
             System.out.print("Opción: ");
             String entrada = in.nextLine();
+
             // 2.2 LÓGICA DE OPCIONES
             switch (entrada) {
-                // --- OPCIÓN 5: SALIR ---
-                // Mostrar mensaje de despedida y romper el bucle principal.
                 case "5":
                     System.out.println("Saliendo del programa ...");
                     System.out.println("Gracias por jugar <3<3<3<3");
                     salir = true;
                     break;
 
-                // --- OPCIÓN 4: CARGAR BARAJA ---
-                // Leer fichero "Barajas/BarajaGuardada.txt".
-                // Rellenar vector jugador y recalcular el elixir gastado. Checkear errores de fichero.
                 case "4":
+                    File carpetaBarajas = new File("Barajas");
                     try{
-                        // Abrir el fichero
+                        if (!carpetaBarajas.exists()){
+                            carpetaBarajas.mkdir();
+                        }
                         Scanner leerFichero = new Scanner(new File("Barajas/BarajaGuardada.txt"));
-                        // Limpiar el vector
                         Methods.initializeDeck(playerDeck);
-                        // Reiniciar el elixir:
                         elixirRestante = Assets.INITIAL_ELIXIR;
-                        // Cargar los personajes
+
                         for ( int i = 0; i< playerDeck.length; i++){
-                            // Comprobamos si hay alguna palabra más que leer.
                             if (leerFichero.hasNext()){
-                                // Leer palabra por palabra.
                                 playerDeck[i] = leerFichero.next();
                                 elixirRestante -= Methods.getCharacterElixir(playerDeck[i].charAt(0));
-
                             }
                         }
-                        // Cerramos el fichero
                         leerFichero.close();
                         System.out.println("Cargando la baraja ...");
                         System.out.println("Baraja cargada correctamente.");
@@ -89,20 +76,14 @@ public class InfortacticsUVa {
                     }
                     break;
 
-                // --- OPCIÓN 3: GUARDAR BARAJA ---
-                // Escribir el contenido del vector jugador en el fichero "Barajas/BarajaGuardada.txt".
-                // Formato de escritura: Strings separados por espacios (Ej: "V33 D41").
                 case "3":
                     try{
-                        // Abrir el fichero
                         PrintWriter escribirFichero = new PrintWriter("Barajas/BarajaGuardada.txt");
                         for ( int i = 0; i< playerDeck.length; i++){
                             if (!playerDeck[i].equals("")){
                                 escribirFichero.print(playerDeck[i]+" ");
-                            } // Si no, está vacío
+                            }
                         }
-
-                        // Cerramos el fichero
                         escribirFichero.close();
                         System.out.println("Guardando la baraja ...");
                         System.out.println("Mazo guardado correctamente.");
@@ -113,13 +94,10 @@ public class InfortacticsUVa {
                     break;
 
 
-                // --- OPCIÓN 2: CONFIGURAR BARAJA ---
                 case "2":
-                    // Llamamos al método y actualizamos el elixir con lo que nos devuelva
                     elixirRestante = configurarBaraja(in, playerDeck, elixirRestante);
                     break;
 
-                // --- OPCIÓN 1: NUEVA PARTIDA---
                 case "1":
                     nuevaPartida(in, playerDeck, enemyDeck);
                     break;
@@ -131,65 +109,130 @@ public class InfortacticsUVa {
             }
 
         }while(!salir);
-
     }
 
     // 3. MÉTODOS OBLIGATORIOS Y AUXILIARES
 
-    // TODO: Definir procedimiento 'printBoard' para dibujar el tablero 6x6.
     /**
-     * Dibuja por pantalla el estado actual del tablero basado en la baraja proporcionada.
-     * Muestra las posiciones y el contenido de cada carta.
-     *
+     * Dibuja por pantalla el estado actual del tablero.
      * @param deck Vector de Strings que contiene las cartas a mostrar.
      */
     public static void printBoard(String[] deck) {
-        // Vacio temporalemente para que no de error mientras compilo mi parte.
-        System.out.println("********************************");
-        System.out.println("(Aquí se dibujará el tablero...)");
-        System.out.println();
-        for (int i =0; i < deck.length; i++){
-            System.out.println("Posición "+i+":"+deck[i]);
+        System.out.println("TABLERO");
+        System.out.println("    0   1   2   3   4   5");
+        System.out.println("  -------------------------");
+
+        for (int i = 0; i < Assets.BOARD_ROWS; i++) {
+
+            // Fila de contenido
+            System.out.print(i + " |");
+
+            for (int j = 0; j < Assets.BOARD_COLUMNS; j++) {
+                String contenidoCelda = " ";
+
+                // Zona enemiga (Sombreada)
+                if (i < 3) {
+                    // Concatenamos comillas vacías para convertir char a String
+                    contenidoCelda = Assets.NO_POSITION + "";
+                }
+
+                // Buscar tropas en deck
+                for (int k = 0; k < deck.length; k++) {
+                    if (!deck[k].equals("")) {
+                        int fila = deck[k].charAt(1) - '0';
+                        int col = deck[k].charAt(2) - '0';
+
+                        if (fila == i && col == j) {
+                            char letra = deck[k].charAt(0);
+
+                            // Traductor de Letra a Emoji
+                            switch(letra) {
+                                case Assets.ARCHER_SYMBOL:
+                                    contenidoCelda = Assets.ARCHER_IMAGE;
+                                    break;
+                                case Assets.DRAGON_SYMBOL:
+                                    contenidoCelda = Assets.DRAGON_IMAGE;
+                                    break;
+                                case Assets.PRINCESS_SYMBOL:
+                                    contenidoCelda = Assets.PRINCESS_IMAGE;
+                                    break;
+                                case Assets.VALKYRIE_SYMBOL:
+                                    contenidoCelda = Assets.VALKYRIE_IMAGE;
+                                    break;
+                                case Assets.GOBLIN_SYMBOL:
+                                    contenidoCelda = Assets.GOBLIN_IMAGE;
+                                    break;
+                                case Assets.PK_SYMBOL:
+                                    contenidoCelda = Assets.PK_IMAGE;
+                                    break;
+                                default:
+                                    contenidoCelda = letra + "";
+                            }
+                        }
+                    }
+                }
+
+                // PRINTF con Emojis
+                if (contenidoCelda.length() > 1) {
+                    // Formato compacto para emojis
+                    System.out.printf(" %s|", contenidoCelda);
+                } else {
+                    // Formato normal para letras
+                    System.out.printf(" %s |", contenidoCelda);
+                }
+            }
+
+            System.out.println();
+            System.out.println("  -------------------------");
         }
     }
 
-    // Método del CASE 1:
-    // Crear método auxiliar para cargar baraja enemiga aleatoria (Opción 1).
-    // Comprobar si la baraja del jugador tiene al menos 1 personaje. Si no -> Error.
-    // Si tiene personajes -> Cargar baraja enemiga aleatoria desde "Barajas/BarajasEnemigas.txt".
     /**
-     * Gestiona el inicio de una nueva partida (Opción 1).
-     * Verifica que el jugador tenga cartas configuradas, carga una baraja enemiga aleatoria desde fichero
-     * y lanza la lógica del juego.
-     *
-     * @param in Scanner para la lectura de datos.
-     * @param playerDeck Baraja actual del jugador.
-     * @param enemyDeck Baraja del enemigo donde se cargarán los datos.
+     * Muestra la tabla de estadísticas de los personajes debajo del tablero.
      */
-    public static void nuevaPartida(Scanner in, String[] playerDeck, String[] enemyDeck) {
-        // 1. Limpiar el vector de enemigos previo
-        Methods.initializeDeck(enemyDeck);
+    public static void printStats() {
+        System.out.println();
+        // Cabecera alineada
+        System.out.printf("%-12s %-7s %-7s %-9s %-9s%n", "Personaje", "Símb.", "Elixir", "%Ataque", "%Defensa");
+        System.out.println("------------------------------------------------");
 
-        // 2. Comprobar si el jugador tiene cartas (Basta con encontrar UNA no vacía)
+        // Filas de datos usando las constantes de Assets
+        printStatRow(Assets.ARCHER_IMAGE + " " + Assets.ARCHER_NAME, Assets.ARCHER_SYMBOL, Assets.ARCHER_ELIXIR, Assets.ARCHER_ATTACK, Assets.ARCHER_DEFENSE);
+        printStatRow(Assets.DRAGON_IMAGE + " " + Assets.DRAGON_NAME, Assets.DRAGON_SYMBOL, Assets.DRAGON_ELIXIR, Assets.DRAGON_ATTACK, Assets.DRAGON_DEFENSE);
+        printStatRow(Assets.PRINCESS_IMAGE + " " + Assets.PRINCESS_NAME, Assets.PRINCESS_SYMBOL, Assets.PRINCESS_ELIXIR, Assets.PRINCESS_ATTACK, Assets.PRINCESS_DEFENSE);
+        printStatRow(Assets.VALKYRIE_IMAGE + " " + Assets.VALKYRIE_NAME, Assets.VALKYRIE_SYMBOL, Assets.VALKYRIE_ELIXIR, Assets.VALKYRIE_ATTACK, Assets.VALKYRIE_DEFENSE);
+        printStatRow(Assets.GOBLIN_IMAGE + " " + Assets.GOBLIN_NAME, Assets.GOBLIN_SYMBOL, Assets.GOBLIN_ELIXIR, Assets.GOBLIN_ATTACK, Assets.GOBLIN_DEFENSE);
+        printStatRow(Assets.PK_IMAGE + " " + Assets.PK_NAME, Assets.PK_SYMBOL, Assets.PK_ELIXIR, Assets.PK_ATTACK, Assets.PK_DEFENSE);
+
+        System.out.println("------------------------------------------------");
+    }
+
+    /**
+     * Método auxiliar para imprimir una fila de estadísticas con formato.
+     */
+    public static void printStatRow(String name, char symbol, int elixir, int attack, int defense) {
+        System.out.printf("%-12s %-7c %-7d %-9d %-9d%n", name, symbol, elixir, attack, defense);
+    }
+
+
+    // Método del CASE 1:
+    public static void nuevaPartida(Scanner in, String[] playerDeck, String[] enemyDeck) {
+        Methods.initializeDeck(enemyDeck);
         boolean hayPersonajes = false;
 
-        // CORRECCIÓN: Usamos un for normal con condición en la cabecera en lugar de break.
         for (int i = 0; i < playerDeck.length && !hayPersonajes; i++) {
             if (!playerDeck[i].equals("")) {
                 hayPersonajes = true;
             }
         }
 
-        // CORRECCIÓN: Usamos IF-ELSE grande para evitar el 'return' en mitad del método.
         if (hayPersonajes) {
-            // 3. Si hay personajes, preparamos el enemigo aleatorio
             System.out.println("Empezando nueva partida ...");
             System.out.println("Buscando rival...");
 
             try {
-                // Leemos todas las líneas del fichero de enemigos
                 Scanner ficheroEnemigos = new Scanner(new File("Barajas/BarajasEnemigas.txt"));
-                String[] listaEnemigos = new String[100]; // Buffer grande para leer líneas
+                String[] listaEnemigos = new String[100];
                 int totalLineas = 0;
 
                 while (ficheroEnemigos.hasNextLine() && totalLineas < listaEnemigos.length) {
@@ -199,11 +242,9 @@ public class InfortacticsUVa {
                 ficheroEnemigos.close();
 
                 if (totalLineas > 0) {
-                    // Elegimos una línea aleatoria
                     int indiceAleatorio = (int) (Math.random() * totalLineas);
                     String lineaEnemiga = listaEnemigos[indiceAleatorio];
 
-                    // Parseamos esa línea para rellenar el enemyDeck
                     Scanner parserLinea = new Scanner(lineaEnemiga);
                     int hueco = 0;
                     while (parserLinea.hasNext() && hueco < enemyDeck.length) {
@@ -212,7 +253,7 @@ public class InfortacticsUVa {
                     }
                     parserLinea.close();
 
-                    // 4. Empezar el juego.
+                    // --- INICIO DE LA PARTIDA ---
                     Methods.startGame(in, playerDeck, enemyDeck);
 
                 } else {
@@ -224,7 +265,6 @@ public class InfortacticsUVa {
             }
 
         } else {
-            // Caso ELSE: Si no hay personajes
             System.out.println("¡Error! Tienes que configurar tu baraja antes.");
             System.out.println("Ve a la opción 2 para comprar tropas.");
         }
@@ -232,13 +272,10 @@ public class InfortacticsUVa {
 
 
     // Método del CASE 2:
-    // Crear método auxiliar para la lógica de configuración (Opción 2) para no llenar el main.
     /**
      * Gestiona el menú de configuración de la baraja permitiendo añadir o borrar tropas.
-     * El flujo de entrada está dividido en dos pasos: selección de personaje y selección de coordenadas.
-     *
-     * @param in            Scanner para leer la entrada del teclado.
-     * @param deck          Array de Strings que representa la baraja del jugador.
+     * @param in Scanner para leer la entrada del teclado.
+     * @param deck Array de Strings que representa la baraja del jugador.
      * @param currentElixir Cantidad de elixir disponible actualmente.
      * @return El elixir restante después de realizar las modificaciones.
      */
@@ -247,18 +284,14 @@ public class InfortacticsUVa {
         boolean seguirEditando = true;
 
         do {
-            // 1. Mostrar estado actual
             printBoard(deck);
+            printStats();
             System.out.println("Elixir restante 💧: " + currentElixir);
 
-            // 2. Primer Prompt
             System.out.print("Personaje a añadir (x para borrar; 0 para guardar): ");
             String entradaAccion = in.nextLine();
 
-            // Si introducimos un Intro ya no entra.
-            // Aquí, controlar que el char introducido no es mas de un caracter:
             if (entradaAccion.length() == 1) {
-
                 char simbolo = entradaAccion.charAt(0);
 
                 switch (simbolo) {
@@ -285,11 +318,9 @@ public class InfortacticsUVa {
 
                                         int coste = Methods.getCharacterElixir(deck[i].charAt(0));
                                         currentElixir += coste;
-
                                         if (currentElixir > Assets.INITIAL_ELIXIR) {
                                             currentElixir = Assets.INITIAL_ELIXIR;
                                         }
-
                                         deck[i] = "";
                                         System.out.println("Personaje borrado correctamente.");
                                         encontrado = true;
@@ -321,19 +352,17 @@ public class InfortacticsUVa {
                                     if (fila >= 3 && fila <= 5 && col >= 0 && col <= 5) {
 
                                         boolean ocupado = false;
-                                        // CORRECCIÓN: No usamos break. La condición !ocupado en el for para el bucle.
                                         for (int i = 0; i < deck.length && !ocupado; i++) {
                                             if (!deck[i].equals("") &&
                                                     (deck[i].charAt(1) - '0' == fila) &&
                                                     (deck[i].charAt(2) - '0' == col)) {
-                                                ocupado = true; // Activamos bandera y el bucle parará solo.
+                                                ocupado = true;
                                             }
                                         }
 
                                         if (!ocupado) {
                                             String cartaFinal = simbolo + entradaPosPoner;
                                             boolean guardado = false;
-                                            // Bucle clásico para guardar
                                             for (int i = 0; i < deck.length && !guardado; i++) {
                                                 if (deck[i].equals("")) {
                                                     deck[i] = cartaFinal;
@@ -356,7 +385,7 @@ public class InfortacticsUVa {
                             }
                         }
                         break;
-                } // Fin del Switch
+                }
             } else {
                 System.out.println("No has introducido un SÍMBOLO correcto. pe (V, K, x, 0 ...) ");
             }
@@ -364,5 +393,81 @@ public class InfortacticsUVa {
         } while (seguirEditando);
 
         return currentElixir;
+    }
+
+    /**
+     * Actualiza y guarda las estadísticas de victorias/derrotas.
+     * Crea la carpeta y el fichero si no existen.
+     * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones académicas.
+     * @param haGanado true si el jugador ganó, false si perdió.
+     */
+    public static void actualizarEstadisticas(boolean haGanado) {
+        int victorias = 0;
+        int derrotas = 0;
+
+        // Ruta relativa
+        File carpeta = new File("Estadisticas");
+        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
+
+        try {
+            // 1. Crear directorio si no existe
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+
+            // 2. Crear archivo si no existe
+            if (!archivo.exists()) {
+                if (archivo.createNewFile()) {
+                    System.out.println("Se ha creado el archivo de estadísticas nuevo.");
+                }
+            } else {
+                // 3. Leer estadísticas previas USANDO SCANNER
+                Scanner lector = new Scanner(archivo);
+
+                // Leer palabra a palabra
+                if (lector.hasNext()) {
+                    // Lee "Victorias:" y lo ignoramos
+                    lector.next();
+                    // Lee el número si existe
+                    if (lector.hasNextInt()) {
+                        victorias = lector.nextInt();
+                    }
+
+                    // Lee "Derrotas:" y lo ignoramos
+                    if (lector.hasNext()) {
+                        lector.next();
+                    }
+                    // Lee el número si existe
+                    if (lector.hasNextInt()) {
+                        derrotas = lector.nextInt();
+                    }
+                }
+                lector.close();
+            }
+
+            // 4. Actualizar contadores
+            if (haGanado) {
+                victorias++;
+                System.out.println("🎉 ¡Victoria registrada en las estadísticas! 🎉");
+            } else {
+                derrotas++;
+                System.out.println("💀 Derrota registrada en las estadísticas. 💀");
+            }
+
+            // 5. Escribir nuevos datos
+            PrintWriter escritor = new PrintWriter(new FileWriter(archivo));
+            escritor.println("Victorias: " + victorias);
+            escritor.println("Derrotas: " + derrotas);
+            escritor.close();
+
+            // Mostrar resumen
+            System.out.println("--- ESTADÍSTICAS TOTALES ---");
+            System.out.println("🏆 Victorias: " + victorias);
+            System.out.println("❌ Derrotas: " + derrotas);
+            System.out.println("----------------------------");
+
+        } catch (IOException e) {
+            System.out.println("Error al guardar estadísticas: " + e.getMessage());
+        }
     }
 }

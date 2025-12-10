@@ -30,7 +30,7 @@ public class Assets {
 	
 	static final String VALKYRIE_NAME = "Valquiria";
 	static final char VALKYRIE_SYMBOL = 'V';
-	static final String VALKYRIE_IMAGE = "⚔︎";
+	static final String VALKYRIE_IMAGE = "\uD83E\uDE93";
 	static final int VALKYRIE_ELIXIR = 3;
 	static final int VALKYRIE_ATTACK = 35;
 	static final int VALKYRIE_DEFENSE = 40;
