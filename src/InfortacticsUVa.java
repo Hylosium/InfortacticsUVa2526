@@ -51,7 +51,6 @@ public class InfortacticsUVa {
                 // --- OPCIÓN 4: CARGAR BARAJA ---
                 // Leer fichero "Barajas/BarajaGuardada.txt".
                 // Rellenar vector jugador y recalcular el elixir gastado. Checkear errores de fichero.
-                // TODO: Me falta el createGameDeck.
                 case "4":
                     System.out.println("Cargando la baraja ...");
                     try{
@@ -193,7 +192,7 @@ public class InfortacticsUVa {
                 }
                 parserLinea.close();
 
-                // 4. ¡A JUGAR! Llamamos a la lógica de tu compañero
+                // 4. Empezar el juego.
                 Methods.startGame(in, playerDeck, enemyDeck);
 
             } else {
@@ -208,13 +207,15 @@ public class InfortacticsUVa {
 
     // Método del CASE 2:
     // Crear método auxiliar para la lógica de configuración (Opción 2) para no llenar el main.
-    // Bucle de configuración:
-    //      - Si introduce '0': Guardar cambios en memoria y volver al menú.
-    //      - Si introduce 'x': Pedir posición y borrar figura (devolver elixir).
-    //      - Si introduce Personaje (A, V...):
-    //          1. Validar elixir suficiente.
-    //          2. Pedir posición (XY). Validar que es zona jugador (filas 3-5) y está vacía [Ver Pág. 3].
-    //          3. Guardar en el vector.
+    /**
+     * Gestiona el menú de configuración de la baraja permitiendo añadir o borrar tropas.
+     * El flujo de entrada está dividido en dos pasos: selección de personaje y selección de coordenadas.
+     *
+     * @param in            Scanner para leer la entrada del teclado.
+     * @param deck          Array de Strings que representa la baraja del jugador.
+     * @param currentElixir Cantidad de elixir disponible actualmente.
+     * @return El elixir restante después de realizar las modificaciones.
+     */
     public static int configurarBaraja(Scanner in, String[] deck, int currentElixir) {
         System.out.println("Configurando la baraja ...");
         boolean seguirEditando = true;
@@ -222,129 +223,124 @@ public class InfortacticsUVa {
         do {
             // 1. Mostrar estado actual
             printBoard(deck);
-            System.out.println("Elixir restante: " + currentElixir);
-            System.out.println("Escribe posición y tropa (ej: V33), 'x' para borrar, o '0' para salir.");
+            System.out.println("Elixir restante 💧: " + currentElixir);
 
-            // 2. Pedir entrada
-            System.out.print("Opción: ");
-            String subEntrada = in.nextLine();
+            // 2. Primer Prompt
+            System.out.print("Personaje a añadir (x para borrar; 0 para guardar): ");
+            String entradaAccion = in.nextLine();
 
-            // 3. Evaluar entrada
-            switch (subEntrada) {
-                case "0":
-                    seguirEditando = false;
-                    System.out.println("Guardando configuración...");
-                    break;
+            // Si introducimos un Intro ya no entra.
+            // Aquí, controlar que el char introducido no es mas de un caracter:
+            if (entradaAccion.length() == 1) {
 
-                case "x":
-                    System.out.println("Entrando en el modo BORRAR ...");
-                    System.out.println("Introduzca las posiciones para borrar un PJ: ");
+                char simbolo = entradaAccion.charAt(0);
 
-                    try {
-                        // Para las filas
-                        int posFilaB = in.nextInt();
-                        // Para las columnas
-                        int posColB = in.nextInt();
-                        // Limpieza de buffer (Enter fantasma)
-                        in.nextLine();
+                switch (simbolo) {
+                    case '0':
+                        seguirEditando = false;
+                        System.out.println("Guardando configuración...");
+                        System.out.println("Mazo guardado correctamente.");
+                        break;
 
-                        // Validamos las coordenadas
-                        if ((posFilaB <= 5 && posFilaB >= 3) && (posColB <= 5 && posColB >= 0)) {
-                            boolean cartaEliminada = false;
-                            for (int i = 0; i < deck.length && !cartaEliminada; i++) {
-                                // Buscar carta no vacía
-                                if (!deck[i].equals("")) {
-                                    // Verificar coordenadas (- '0' es char a int)
-                                    if (deck[i].charAt(1) - '0' == posFilaB &&
-                                            deck[i].charAt(2) - '0' == posColB) {
+                    case 'x':
+                        System.out.print("Introduce posición (p.ej. 33): ");
+                        String entradaPosBorrar = in.nextLine();
 
-                                        // Calcular reembolso
+                        if (entradaPosBorrar.length() == 2) {
+                            int filaB = entradaPosBorrar.charAt(0) - '0';
+                            int colB = entradaPosBorrar.charAt(1) - '0';
+
+                            if (filaB >= 3 && filaB <= 5 && colB >= 0 && colB <= 5) {
+                                boolean encontrado = false;
+                                for (int i = 0; i < deck.length && !encontrado; i++) {
+                                    if (!deck[i].equals("") &&
+                                            (deck[i].charAt(1) - '0' == filaB) &&
+                                            (deck[i].charAt(2) - '0' == colB)) {
+
                                         int coste = Methods.getCharacterElixir(deck[i].charAt(0));
+                                        currentElixir += coste;
 
-                                        if (coste > 0) {
-                                            currentElixir += coste;
-                                            // Tope de elixir
-                                            if (currentElixir > Assets.INITIAL_ELIXIR) {
-                                                currentElixir = Assets.INITIAL_ELIXIR;
-                                            }
-                                            // Borrar
-                                            deck[i] = "";
-                                            System.out.println("Personaje borrado y elixir recuperado.");
-                                            cartaEliminada = true;
+                                        if (currentElixir > Assets.INITIAL_ELIXIR) {
+                                            currentElixir = Assets.INITIAL_ELIXIR;
                                         }
+
+                                        deck[i] = "";
+                                        System.out.println("Personaje borrado correctamente.");
+                                        encontrado = true;
                                     }
                                 }
-                            }
-                            if (!cartaEliminada) {
-                                System.out.println("No se encontró ninguna tropa en esa posición.");
-                            }
-                        } else {
-                            System.out.println("Las posiciones introducidas no son válidas.");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Error: Introduce números válidos.");
-                        in.nextLine(); // Limpiar error del scanner
-                    }
-                    break;
-
-                default: // AÑADIR TROPA
-                    System.out.println("Intentando añadir tropa...");
-                    if (subEntrada.length() == 3) {
-                        int coste = Methods.getCharacterElixir(subEntrada.charAt(0));
-                        int pjFil = subEntrada.charAt(1) - '0';
-                        int pjCol = subEntrada.charAt(2) - '0';
-
-                        // 1. Validar que el personaje existe
-                        if (coste > 0) {
-                            // 2. Validar presupuesto
-                            if ((currentElixir - coste >= 0)) {
-                                // 3. Validar tablero
-                                if ((pjFil >= 3 && pjFil <= 5) && (pjCol >= 0 && pjCol <= 5)) {
-
-                                    boolean posicionOcupada = false;
-
-                                    // 4. Detector de fantasmas (ocupación)
-                                    for (int i = 0; i < deck.length && !posicionOcupada; i++) {
-                                        if ((!deck[i].equals("")) &&
-                                                (deck[i].charAt(1) - '0' == pjFil) &&
-                                                (deck[i].charAt(2) - '0' == pjCol)) {
-                                            posicionOcupada = true;
-                                        }
-                                    }
-
-                                    // 5. Guardar si está libre
-                                    if (!posicionOcupada) {
-                                        boolean cartaGuardada = false;
-                                        int contadorHuecos = 0;
-                                        while (!cartaGuardada && contadorHuecos < deck.length) {
-                                            if (deck[contadorHuecos].equals("")) {
-                                                currentElixir -= coste;
-                                                deck[contadorHuecos] = subEntrada;
-                                                cartaGuardada = true;
-                                                System.out.println("PJ Configurado con éxito.");
-                                            }
-                                            contadorHuecos++;
-                                        }
-                                    } else {
-                                        System.out.println("¡Error! Esa posición ya está ocupada.");
-                                    }
-                                } else {
-                                    System.out.println("Posiciones no válidas (Filas 3-5).");
+                                if (!encontrado) {
+                                    System.out.println("No hay ninguna tropa en esa posición.");
                                 }
                             } else {
-                                System.out.println("No tienes suficiente dinero.");
+                                System.out.println("Posición fuera de la zona del jugador (Filas 3-5).");
                             }
                         } else {
-                            System.out.println("El personaje introducido no es válido.");
+                            System.out.println("Formato de posición incorrecto. Debe ser XY (ej: 33).");
                         }
-                    } else {
-                        System.out.println("Formato incorrecto. Usa ej: A33");
-                    }
-                    break;
+                        break;
+
+                    default:
+                        int coste = Methods.getCharacterElixir(simbolo);
+
+                        if (coste > 0) {
+                            if (currentElixir - coste >= 0) {
+                                System.out.print("Introduce posición (p.ej. 33): ");
+                                String entradaPosPoner = in.nextLine();
+
+                                if (entradaPosPoner.length() == 2) {
+                                    int fila = entradaPosPoner.charAt(0) - '0';
+                                    int col = entradaPosPoner.charAt(1) - '0';
+
+                                    if (fila >= 3 && fila <= 5 && col >= 0 && col <= 5) {
+
+                                        // -------------------------------------------------
+                                        // DETECTOR DE OCUPACIÓN (Versión Clásica)
+                                        // -------------------------------------------------
+                                        boolean ocupado = false;
+                                        for (int i = 0; i < deck.length && !ocupado; i++) {
+                                            // Usamos deck[i] en vez de la variable 'carta'
+                                            if (!deck[i].equals("") &&
+                                                    (deck[i].charAt(1) - '0' == fila) &&
+                                                    (deck[i].charAt(2) - '0' == col)) {
+                                                ocupado = true; // Activamos bandera para salir
+                                            }
+                                        }
+                                        // -------------------------------------------------
+
+                                        if (!ocupado) {
+                                            String cartaFinal = simbolo + entradaPosPoner;
+                                            boolean guardado = false;
+                                            // Bucle clásico para guardar
+                                            for (int i = 0; i < deck.length && !guardado; i++) {
+                                                if (deck[i].equals("")) {
+                                                    deck[i] = cartaFinal;
+                                                    currentElixir -= coste;
+                                                    guardado = true;
+                                                    System.out.println("Tropa añadida con éxito.");
+                                                }
+                                            }
+                                        } else {
+                                            System.out.println("¡Esa casilla ya está ocupada!");
+                                        }
+                                    } else {
+                                        System.out.println("Posición no válida (Filas 3-5).");
+                                    }
+                                } else {
+                                    System.out.println("Formato de posición incorrecto (ej: 33).");
+                                }
+                            } else {
+                                System.out.println("¡No tienes suficiente elixir!");
+                            }
+                        }
+                        break;
+                } // Fin del Switch
+            } else {
+                System.out.println("No has introducido un SÍMBOLO correcto. pe (V, K, x, 0 ...) ");
             }
+
         } while (seguirEditando);
 
         return currentElixir;
     }
-
 }
