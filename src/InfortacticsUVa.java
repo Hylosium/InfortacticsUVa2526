@@ -51,6 +51,7 @@ public class InfortacticsUVa {
                 // --- OPCIÓN 4: CARGAR BARAJA ---
                 // Leer fichero "Barajas/BarajaGuardada.txt".
                 // Rellenar vector jugador y recalcular el elixir gastado. Checkear errores de fichero.
+                // TODO: Me falta el createGameDeck.
                 case "4":
                     System.out.println("Cargando la baraja ...");
                     try{
