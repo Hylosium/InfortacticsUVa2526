@@ -12,7 +12,6 @@ public class InfortacticsUVa {
 
     /**
      * Método principal de la aplicación.
-     * @param args Argumentos de la línea de comandos.
      */
     public static void main(String[] args) {
         // 1. PREPARACIÓN DE DATOS
@@ -45,59 +44,30 @@ public class InfortacticsUVa {
 
             // 2.2 LÓGICA DE OPCIONES
             switch (entrada) {
+                // --- OPCIÓN 5: SALIR ---
                 case "5":
                     System.out.println("Saliendo del programa ...");
                     System.out.println("Gracias por jugar <3<3<3<3");
                     salir = true;
                     break;
 
+                // --- OPCIÓN 4: CARGAR BARAJA ---
                 case "4":
-                    File carpetaBarajas = new File("Barajas");
-                    try{
-                        if (!carpetaBarajas.exists()){
-                            carpetaBarajas.mkdir();
-                        }
-                        Scanner leerFichero = new Scanner(new File("Barajas/BarajaGuardada.txt"));
-                        Methods.initializeDeck(playerDeck);
-                        elixirRestante = Assets.INITIAL_ELIXIR;
-
-                        for ( int i = 0; i< playerDeck.length; i++){
-                            if (leerFichero.hasNext()){
-                                playerDeck[i] = leerFichero.next();
-                                elixirRestante -= Methods.getCharacterElixir(playerDeck[i].charAt(0));
-                            }
-                        }
-                        leerFichero.close();
-                        System.out.println("Cargando la baraja ...");
-                        System.out.println("Baraja cargada correctamente.");
-                    } catch (Exception e){
-                        System.out.println("Error: "+e.getMessage());
-                        System.out.println("No ha sido posible cargar la baraja correctamente. Inténtalo de nuevo.");
-                    }
+                    // Llamamos a la función y actualizamos el elixir
+                    elixirRestante = cargarBaraja(playerDeck, elixirRestante);
                     break;
 
+                // --- OPCIÓN 3: GUARDAR BARAJA ---
                 case "3":
-                    try{
-                        PrintWriter escribirFichero = new PrintWriter("Barajas/BarajaGuardada.txt");
-                        for ( int i = 0; i< playerDeck.length; i++){
-                            if (!playerDeck[i].equals("")){
-                                escribirFichero.print(playerDeck[i]+" ");
-                            }
-                        }
-                        escribirFichero.close();
-                        System.out.println("Guardando la baraja ...");
-                        System.out.println("Mazo guardado correctamente.");
-                    } catch (Exception e){
-                        System.out.println("Error: "+e.getMessage());
-                        System.out.println("No ha sido posible guardar la baraja.");
-                    }
+                    guardarBaraja(playerDeck);
                     break;
 
-
+                // --- OPCIÓN 2: CONFIGURAR BARAJA ---
                 case "2":
                     elixirRestante = configurarBaraja(in, playerDeck, elixirRestante);
                     break;
 
+                // --- OPCIÓN 1: NUEVA PARTIDA ---
                 case "1":
                     nuevaPartida(in, playerDeck, enemyDeck);
                     break;
@@ -107,6 +77,8 @@ public class InfortacticsUVa {
                     System.out.println("Vuelve a intentarlo.");
                     break;
             }
+
+            //Methods.flushScreen();
 
         }while(!salir);
     }
@@ -130,7 +102,7 @@ public class InfortacticsUVa {
             for (int j = 0; j < Assets.BOARD_COLUMNS; j++) {
                 String contenidoCelda = " ";
 
-                // Zona enemiga (Sombreada)
+                // Zona enemiga (Sombreado)
                 if (i < 3) {
                     // Concatenamos comillas vacías para convertir char a String
                     contenidoCelda = Assets.NO_POSITION + "";
@@ -210,29 +182,105 @@ public class InfortacticsUVa {
     /**
      * Método auxiliar para imprimir una fila de estadísticas con formato.
      */
-    /*
-    // EXPLICACIÓN DEL FORMATO printf:
-       "%-12s" -> Columna 1 (Nombre): Reserva 12 huecos, alinea a la izquierda (String).
-       "%-7c"  -> Columna 2 (Símbolo): Reserva 7 huecos, alinea a la izquierda (Char).
-       "%-7d"  -> Columna 3 (Elixir):  Reserva 7 huecos, alinea a la izquierda (Entero).
-       "%-9d"  -> Columna 4 (Ataque):  Reserva 9 huecos, alinea a la izquierda (Entero).
-       "%-9d"  -> Columna 5 (Defensa): Reserva 9 huecos, alinea a la izquierda (Entero).
-       "%n"    -> Salto de línea final.
-    * */
     public static void printStatRow(String name, char symbol, int elixir, int attack, int defense) {
         System.out.printf("%-12s %-7c %-7d %-9d %-9d%n", name, symbol, elixir, attack, defense);
     }
 
+    // --- MÉTODOS DE GESTIÓN DE BARAJAS (CARGAR/GUARDAR) ---
 
+    // Método del CASE 4:
+    /**
+     * Carga una baraja desde un fichero y actualiza el elixir restante.
+     * @param playerDeck Vector donde se cargarán los datos.
+     * @param currentElixir Elixir actual (se reinicia al cargar).
+     * @return El nuevo valor del elixir restante tras cargar las cartas.
+     */
+    public static int cargarBaraja(String[] playerDeck, int currentElixir) {
+        System.out.println("Cargando la baraja ...");
+        File carpetaBarajas = new File("Barajas");
+        File archivoBaraja = new File("Barajas/BarajaGuardada.txt");
+
+        try {
+            if (!carpetaBarajas.exists()) {
+                carpetaBarajas.mkdir();
+            }
+
+            // Comprobamos si existe antes de leer
+            if (archivoBaraja.exists()) {
+                Scanner leerFichero = new Scanner(archivoBaraja);
+                Methods.initializeDeck(playerDeck);
+                currentElixir = Assets.INITIAL_ELIXIR;
+
+                for (int i = 0; i < playerDeck.length; i++) {
+                    if (leerFichero.hasNext()) {
+                        playerDeck[i] = leerFichero.next();
+                        currentElixir -= Methods.getCharacterElixir(playerDeck[i].charAt(0));
+                    }
+                }
+                leerFichero.close();
+                System.out.println("Baraja cargada correctamente.");
+            } else {
+                System.out.println("No existe ninguna baraja guardada previamente.");
+                System.out.println("Usa la opción 3 para guardar una primero.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("No ha sido posible cargar la baraja correctamente.");
+        }
+        return currentElixir;
+    }
+
+    // Método del CASE 3:
+    /**
+     * Guarda la baraja actual en un fichero de texto.
+     * @param playerDeck Vector con las cartas del jugador.
+     */
+    public static void guardarBaraja(String[] playerDeck) {
+        System.out.println("Guardando la baraja ...");
+        try {
+            File carpeta = new File("Barajas");
+            if (!carpeta.exists()) carpeta.mkdir();
+
+            // Usamos FileWriter
+            FileWriter escribirFichero = new FileWriter("Barajas/BarajaGuardada.txt");
+
+            for (int i = 0; i < playerDeck.length; i++) {
+                if (!playerDeck[i].equals("")) {
+                    escribirFichero.write(playerDeck[i] + " ");
+                }
+            }
+            escribirFichero.close();
+            System.out.println("Mazo guardado correctamente.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("No ha sido posible guardar la baraja.");
+        }
+    }
+
+
+    // --- LÓGICA DEL JUEGO ---
     // Método del CASE 1:
+    // Crear método auxiliar para cargar baraja enemiga aleatoria (Opción 1).
+    /**
+     * Gestiona el inicio de una nueva partida (Opción 1).
+     * Comprueba si el jugador tiene cartas. Si es así, carga un enemigo aleatorio
+     * desde el fichero "Barajas/BarajasEnemigas.txt" y lanza la lógica del juego.
+     *
+     * @param in Scanner para la lectura de datos.
+     * @param playerDeck Baraja actual del jugador.
+     * @param enemyDeck Baraja del enemigo donde se cargarán los datos.
+     */
     public static void nuevaPartida(Scanner in, String[] playerDeck, String[] enemyDeck) {
         Methods.initializeDeck(enemyDeck);
         boolean hayPersonajes = false;
 
-        for (int i = 0; i < playerDeck.length && !hayPersonajes; i++) {
-            if (!playerDeck[i].equals("")) {
+        // Bucle WHile
+        int cont = 0;
+        while (cont < playerDeck.length && !hayPersonajes){
+            if (!playerDeck[cont].equals("")) {
                 hayPersonajes = true;
             }
+            cont++;
         }
 
         if (hayPersonajes) {
@@ -244,6 +292,8 @@ public class InfortacticsUVa {
                 String[] listaEnemigos = new String[100];
                 int totalLineas = 0;
 
+                // Leemos todas las líneas del fichero BarajasEnemigas.txt
+                // Calculamos el total de líneas del fichero.
                 while (ficheroEnemigos.hasNextLine() && totalLineas < listaEnemigos.length) {
                     listaEnemigos[totalLineas] = ficheroEnemigos.nextLine();
                     totalLineas++;
@@ -251,11 +301,15 @@ public class InfortacticsUVa {
                 ficheroEnemigos.close();
 
                 if (totalLineas > 0) {
+                    // Número aleatorio entre el 0 y el total de líneas.
                     int indiceAleatorio = (int) (Math.random() * totalLineas);
+                    // Elegimos una linea del fichero
                     String lineaEnemiga = listaEnemigos[indiceAleatorio];
 
+                    // Metemos en un Scanner la línea elegida. No metemos un fichero esta vez!
                     Scanner parserLinea = new Scanner(lineaEnemiga);
                     int hueco = 0;
+                    // Rellenamos con la línea el vector de enemyDeck.
                     while (parserLinea.hasNext() && hueco < enemyDeck.length) {
                         enemyDeck[hueco] = parserLinea.next();
                         hueco++;
@@ -407,7 +461,6 @@ public class InfortacticsUVa {
     /**
      * Actualiza y guarda las estadísticas de victorias/derrotas.
      * Crea la carpeta y el fichero si no existen.
-     * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones académicas.
      * @param haGanado true si el jugador ganó, false si perdió.
      */
     public static void actualizarEstadisticas(boolean haGanado) {
@@ -416,7 +469,7 @@ public class InfortacticsUVa {
 
         // Ruta relativa
         File carpeta = new File("Estadisticas");
-        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
+        File archivo = new File("Estadisticas/estadisticas.txt");
 
         try {
             // 1. Crear directorio si no existe
@@ -433,7 +486,7 @@ public class InfortacticsUVa {
                 // 3. Leer estadísticas previas USANDO SCANNER
                 Scanner lector = new Scanner(archivo);
 
-                // Leer palabra a palabra
+                // Leemos token a token
                 if (lector.hasNext()) {
                     // Lee "Victorias:" y lo ignoramos
                     lector.next();
