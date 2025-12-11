@@ -1,7 +1,6 @@
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.PrintWriter; // Usamos PrintWriter
 import java.util.Scanner;
 
 /**
@@ -15,10 +14,16 @@ public class InfortacticsUVa {
      */
     public static void main(String[] args) {
         // 1. PREPARACIÓN DE DATOS
+        // Inicializar Scanner.
         Scanner in = new Scanner(System.in);
+        // Cantidad de elixir.
         int elixirRestante = Assets.INITIAL_ELIXIR;
+        // Se definen los strings con la cantidad de "INITIAL_ELIXIR" por escalabilidad en el futuro.
+        // Si cambias la constante en Assets.java se replica aquí también.
 
+        // Definir vector de Strings para baraja del Jugador (inicializar a INITIAL_ELIXIR)
         String[] playerDeck = new String[Assets.INITIAL_ELIXIR];
+        // Definir vector de Strings para baraja del Enemigo (inicializar a INITIAL_ELIXIR)
         String[] enemyDeck = new String[Assets.INITIAL_ELIXIR];
 
         for (int i = 0; i < playerDeck.length; i++){
@@ -27,6 +32,7 @@ public class InfortacticsUVa {
         }
 
         // 2. BUCLE DEL MENÚ PRINCIPAL
+        // Crear bucle (while) que se repita hasta que el usuario elija "Salir"
         boolean salir = false;
 
         do{
@@ -165,7 +171,7 @@ public class InfortacticsUVa {
     public static void printStats() {
         System.out.println();
         // Cabecera alineada
-        System.out.printf("%-12s %-7s %-7s %-9s %-9s%n", "Personaje", "Símb.", "Elixir", "%Ataque", "%Defensa");
+        System.out.printf("%-13s %-7s %-7s %-9s %-9s%n", "Personaje", "Símb.", "Elixir", "%Ataque", "%Defensa");
         System.out.println("------------------------------------------------");
 
         // Filas de datos usando las constantes de Assets
@@ -183,7 +189,7 @@ public class InfortacticsUVa {
      * Método auxiliar para imprimir una fila de estadísticas con formato.
      */
     public static void printStatRow(String name, char symbol, int elixir, int attack, int defense) {
-        System.out.printf("%-12s %-7c %-7d %-9d %-9d%n", name, symbol, elixir, attack, defense);
+        System.out.printf("%-13s %-7c %-7d %-9d %-9d%n", name, symbol, elixir, attack, defense);
     }
 
     // --- MÉTODOS DE GESTIÓN DE BARAJAS (CARGAR/GUARDAR) ---
@@ -238,15 +244,17 @@ public class InfortacticsUVa {
     public static void guardarBaraja(String[] playerDeck) {
         System.out.println("Guardando la baraja ...");
         try {
+            // Crear carpeta si no existe (Control de errores)
             File carpeta = new File("Barajas");
             if (!carpeta.exists()) carpeta.mkdir();
 
-            // Usamos FileWriter
-            FileWriter escribirFichero = new FileWriter("Barajas/BarajaGuardada.txt");
+            // Usamos PrintWriter como solicitado (más fácil para escribir strings)
+            PrintWriter escribirFichero = new PrintWriter("Barajas/BarajaGuardada.txt");
 
             for (int i = 0; i < playerDeck.length; i++) {
                 if (!playerDeck[i].equals("")) {
-                    escribirFichero.write(playerDeck[i] + " ");
+                    // Escribir el personaje y las coordenadas en el fichero:
+                    escribirFichero.print(playerDeck[i] + " ");
                 }
             }
             escribirFichero.close();
@@ -259,6 +267,7 @@ public class InfortacticsUVa {
 
 
     // --- LÓGICA DEL JUEGO ---
+
     // Método del CASE 1:
     // Crear método auxiliar para cargar baraja enemiga aleatoria (Opción 1).
     /**
@@ -354,6 +363,7 @@ public class InfortacticsUVa {
             System.out.print("Personaje a añadir (x para borrar; 0 para guardar): ");
             String entradaAccion = in.nextLine();
 
+            // Si introducimos un Intro ya no entra.
             if (entradaAccion.length() == 1) {
                 char simbolo = entradaAccion.charAt(0);
 
@@ -428,7 +438,7 @@ public class InfortacticsUVa {
                                             boolean guardado = false;
                                             for (int i = 0; i < deck.length && !guardado; i++) {
                                                 if (deck[i].equals("")) {
-                                                    deck[i] = cartaFinal;
+                                                    deck[i] = simbolo + entradaPosPoner;
                                                     currentElixir -= coste;
                                                     guardado = true;
                                                     System.out.println("Tropa añadida con éxito.");
@@ -461,6 +471,7 @@ public class InfortacticsUVa {
     /**
      * Actualiza y guarda las estadísticas de victorias/derrotas.
      * Crea la carpeta y el fichero si no existen.
+     * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones académicas.
      * @param haGanado true si el jugador ganó, false si perdió.
      */
     public static void actualizarEstadisticas(boolean haGanado) {
@@ -469,7 +480,7 @@ public class InfortacticsUVa {
 
         // Ruta relativa
         File carpeta = new File("Estadisticas");
-        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
+        File archivo = new File("Estadisticas/estadisticas.txt");
 
         try {
             // 1. Crear directorio si no existe
@@ -517,7 +528,8 @@ public class InfortacticsUVa {
             }
 
             // 5. Escribir nuevos datos
-            PrintWriter escritor = new PrintWriter(new FileWriter(archivo));
+            // Usamos PrintWriter (es más cómodo que FileWriter)
+            PrintWriter escritor = new PrintWriter(archivo);
             escritor.println("Victorias: " + victorias);
             escritor.println("Derrotas: " + derrotas);
             escritor.close();
