@@ -338,7 +338,16 @@ public class InfortacticsUVa {
                     parserLinea.close();
 
                     // --- INICIO DE LA PARTIDA ---
-                    Methods.startGame(in, playerDeck, enemyDeck);
+                    int resultado = Methods.startGame(in, playerDeck, enemyDeck);
+
+                    // Actualizar estadísticas si hubo un ganador (1: Jugador, 0: Enemigo)
+                    if (resultado != -1) {
+                        actualizarEstadisticas(resultado == 1);
+                    }
+
+                    System.out.println("Presiona Intro para volver al menú...");
+                    in.nextLine();
+                    Methods.flushScreen();
 
                 } else {
                     System.out.println("Error: El fichero de enemigos está vacío.");
