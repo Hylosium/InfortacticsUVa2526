@@ -5,7 +5,8 @@ import java.util.Scanner;
 
 /**
  * Clase principal del juego InforTactics UVa.
- * Gestiona el menú principal, la persistencia de datos y el flujo general de la aplicación.
+ * Gestiona el menú principal, la persistencia de datos y el flujo general de la
+ * aplicación.
  */
 public class InfortacticsUVa {
 
@@ -18,24 +19,27 @@ public class InfortacticsUVa {
         Scanner in = new Scanner(System.in);
         // Cantidad de elixir.
         int elixirRestante = Assets.INITIAL_ELIXIR;
-        // Se definen los strings con la cantidad de "INITIAL_ELIXIR" por escalabilidad en el futuro.
+        // Se definen los strings con la cantidad de "INITIAL_ELIXIR" por escalabilidad
+        // en el futuro.
         // Si cambias la constante en Assets.java se replica aquí también.
 
-        // Definir vector de Strings para baraja del Jugador (inicializar a INITIAL_ELIXIR)
+        // Definir vector de Strings para baraja del Jugador (inicializar a
+        // INITIAL_ELIXIR)
         String[] playerDeck = new String[Assets.INITIAL_ELIXIR];
-        // Definir vector de Strings para baraja del Enemigo (inicializar a INITIAL_ELIXIR)
+        // Definir vector de Strings para baraja del Enemigo (inicializar a
+        // INITIAL_ELIXIR)
         String[] enemyDeck = new String[Assets.INITIAL_ELIXIR];
 
-        for (int i = 0; i < playerDeck.length; i++){
-            playerDeck[i]="";
-            enemyDeck[i]="";
+        for (int i = 0; i < playerDeck.length; i++) {
+            playerDeck[i] = "";
+            enemyDeck[i] = "";
         }
 
         // 2. BUCLE DEL MENÚ PRINCIPAL
         // Crear bucle (while) que se repita hasta que el usuario elija "Salir"
         boolean salir = false;
 
-        do{
+        do {
             System.out.println("🏰  InforTactics UVa  🏰");
             System.out.println(".______________________.");
             System.out.println("| 1. Nueva Partida     |");
@@ -84,15 +88,16 @@ public class InfortacticsUVa {
                     break;
             }
 
-            //Methods.flushScreen();
+            // Methods.flushScreen();
 
-        }while(!salir);
+        } while (!salir);
     }
 
     // 3. MÉTODOS OBLIGATORIOS Y AUXILIARES
 
     /**
      * Dibuja por pantalla el estado actual del tablero.
+     * 
      * @param deck Vector de Strings que contiene las cartas a mostrar.
      */
     public static void printBoard(String[] deck) {
@@ -124,7 +129,7 @@ public class InfortacticsUVa {
                             char letra = deck[k].charAt(0);
 
                             // Traductor de Letra a Emoji
-                            switch(letra) {
+                            switch (letra) {
                                 case Assets.ARCHER_SYMBOL:
                                     contenidoCelda = Assets.ARCHER_IMAGE;
                                     break;
@@ -175,12 +180,18 @@ public class InfortacticsUVa {
         System.out.println("------------------------------------------------");
 
         // Filas de datos usando las constantes de Assets
-        printStatRow(Assets.ARCHER_IMAGE + " " + Assets.ARCHER_NAME, Assets.ARCHER_SYMBOL, Assets.ARCHER_ELIXIR, Assets.ARCHER_ATTACK, Assets.ARCHER_DEFENSE);
-        printStatRow(Assets.DRAGON_IMAGE + " " + Assets.DRAGON_NAME, Assets.DRAGON_SYMBOL, Assets.DRAGON_ELIXIR, Assets.DRAGON_ATTACK, Assets.DRAGON_DEFENSE);
-        printStatRow(Assets.PRINCESS_IMAGE + " " + Assets.PRINCESS_NAME, Assets.PRINCESS_SYMBOL, Assets.PRINCESS_ELIXIR, Assets.PRINCESS_ATTACK, Assets.PRINCESS_DEFENSE);
-        printStatRow(Assets.VALKYRIE_IMAGE + " " + Assets.VALKYRIE_NAME, Assets.VALKYRIE_SYMBOL, Assets.VALKYRIE_ELIXIR, Assets.VALKYRIE_ATTACK, Assets.VALKYRIE_DEFENSE);
-        printStatRow(Assets.GOBLIN_IMAGE + " " + Assets.GOBLIN_NAME, Assets.GOBLIN_SYMBOL, Assets.GOBLIN_ELIXIR, Assets.GOBLIN_ATTACK, Assets.GOBLIN_DEFENSE);
-        printStatRow(Assets.PK_IMAGE + " " + Assets.PK_NAME, Assets.PK_SYMBOL, Assets.PK_ELIXIR, Assets.PK_ATTACK, Assets.PK_DEFENSE);
+        printStatRow(Assets.ARCHER_IMAGE + " " + Assets.ARCHER_NAME, Assets.ARCHER_SYMBOL, Assets.ARCHER_ELIXIR,
+                Assets.ARCHER_ATTACK, Assets.ARCHER_DEFENSE);
+        printStatRow(Assets.DRAGON_IMAGE + " " + Assets.DRAGON_NAME, Assets.DRAGON_SYMBOL, Assets.DRAGON_ELIXIR,
+                Assets.DRAGON_ATTACK, Assets.DRAGON_DEFENSE);
+        printStatRow(Assets.PRINCESS_IMAGE + " " + Assets.PRINCESS_NAME, Assets.PRINCESS_SYMBOL, Assets.PRINCESS_ELIXIR,
+                Assets.PRINCESS_ATTACK, Assets.PRINCESS_DEFENSE);
+        printStatRow(Assets.VALKYRIE_IMAGE + " " + Assets.VALKYRIE_NAME, Assets.VALKYRIE_SYMBOL, Assets.VALKYRIE_ELIXIR,
+                Assets.VALKYRIE_ATTACK, Assets.VALKYRIE_DEFENSE);
+        printStatRow(Assets.GOBLIN_IMAGE + " " + Assets.GOBLIN_NAME, Assets.GOBLIN_SYMBOL, Assets.GOBLIN_ELIXIR,
+                Assets.GOBLIN_ATTACK, Assets.GOBLIN_DEFENSE);
+        printStatRow(Assets.PK_IMAGE + " " + Assets.PK_NAME, Assets.PK_SYMBOL, Assets.PK_ELIXIR, Assets.PK_ATTACK,
+                Assets.PK_DEFENSE);
 
         System.out.println("------------------------------------------------");
     }
@@ -197,7 +208,8 @@ public class InfortacticsUVa {
     // Método del CASE 4:
     /**
      * Carga una baraja desde un fichero y actualiza el elixir restante.
-     * @param playerDeck Vector donde se cargarán los datos.
+     * 
+     * @param playerDeck    Vector donde se cargarán los datos.
      * @param currentElixir Elixir actual (se reinicia al cargar).
      * @return El nuevo valor del elixir restante tras cargar las cartas.
      */
@@ -239,6 +251,7 @@ public class InfortacticsUVa {
     // Método del CASE 3:
     /**
      * Guarda la baraja actual en un fichero de texto.
+     * 
      * @param playerDeck Vector con las cartas del jugador.
      */
     public static void guardarBaraja(String[] playerDeck) {
@@ -246,7 +259,8 @@ public class InfortacticsUVa {
         try {
             // Crear carpeta si no existe (Control de errores)
             File carpeta = new File("Barajas");
-            if (!carpeta.exists()) carpeta.mkdir();
+            if (!carpeta.exists())
+                carpeta.mkdir();
 
             // Usamos PrintWriter como solicitado (más fácil para escribir strings)
             PrintWriter escribirFichero = new PrintWriter("Barajas/BarajaGuardada.txt");
@@ -265,7 +279,6 @@ public class InfortacticsUVa {
         }
     }
 
-
     // --- LÓGICA DEL JUEGO ---
     // Método del CASE 1:
     // Crear método auxiliar para cargar baraja enemiga aleatoria (Opción 1).
@@ -274,9 +287,9 @@ public class InfortacticsUVa {
      * Comprueba si el jugador tiene cartas. Si es así, carga un enemigo aleatorio
      * desde el fichero "Barajas/BarajasEnemigas.txt" y lanza la lógica del juego.
      *
-     * @param in Scanner para la lectura de datos.
+     * @param in         Scanner para la lectura de datos.
      * @param playerDeck Baraja actual del jugador.
-     * @param enemyDeck Baraja del enemigo donde se cargarán los datos.
+     * @param enemyDeck  Baraja del enemigo donde se cargarán los datos.
      */
     public static void nuevaPartida(Scanner in, String[] playerDeck, String[] enemyDeck) {
         Methods.initializeDeck(enemyDeck);
@@ -284,7 +297,7 @@ public class InfortacticsUVa {
 
         // Bucle While
         int cont = 0;
-        while (cont < playerDeck.length && !hayPersonajes){
+        while (cont < playerDeck.length && !hayPersonajes) {
             if (!playerDeck[cont].equals("")) {
                 hayPersonajes = true;
             }
@@ -341,12 +354,13 @@ public class InfortacticsUVa {
         }
     }
 
-
     // Método del CASE 2:
     /**
-     * Gestiona el menú de configuración de la baraja permitiendo añadir o borrar tropas.
-     * @param in Scanner para leer la entrada del teclado.
-     * @param deck Array de Strings que representa la baraja del jugador.
+     * Gestiona el menú de configuración de la baraja permitiendo añadir o borrar
+     * tropas.
+     * 
+     * @param in            Scanner para leer la entrada del teclado.
+     * @param deck          Array de Strings que representa la baraja del jugador.
      * @param currentElixir Cantidad de elixir disponible actualmente.
      * @return El elixir restante después de realizar las modificaciones.
      */
@@ -470,16 +484,19 @@ public class InfortacticsUVa {
     /**
      * Actualiza y guarda las estadísticas de victorias/derrotas.
      * Crea la carpeta y el fichero si no existen.
-     * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones académicas.
+     * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones
+     * académicas.
+     * 
      * @param haGanado true si el jugador ganó, false si perdió.
      */
     public static void actualizarEstadisticas(boolean haGanado) {
         int victorias = 0;
         int derrotas = 0;
+        boolean lecturaCorrecta = true;
 
         // Ruta relativa
         File carpeta = new File("Estadisticas");
-        File archivo = new File("Estadisticas/estadisticas.txt");
+        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
 
         try {
             // 1. Crear directorio si no existe
@@ -496,48 +513,61 @@ public class InfortacticsUVa {
                 // 3. Leer estadísticas previas USANDO SCANNER
                 Scanner lector = new Scanner(archivo);
 
-                // Leemos token a token
-                if (lector.hasNext()) {
-                    // Lee "Victorias:" y lo ignoramos
-                    lector.next();
-                    // Lee el número si existe
-                    if (lector.hasNextInt()) {
-                        victorias = lector.nextInt();
-                    }
-
-                    // Lee "Derrotas:" y lo ignoramos
+                try {
+                    // Leemos token a token esperando el formato "Victorias: X"
                     if (lector.hasNext()) {
-                        lector.next();
+                        lector.next(); // Ignoramos "Victorias:"
+                        if (lector.hasNextInt()) {
+                            victorias = lector.nextInt();
+                        } else {
+                            lecturaCorrecta = false;
+                        }
+
+                        // Lee "Derrotas:" y lo ignoramos
+                        if (lector.hasNext()) {
+                            lector.next(); // Ignoramos "Derrotas:"
+                        }
+                        // Lee el número si existe
+                        if (lector.hasNextInt()) {
+                            derrotas = lector.nextInt();
+                        } else {
+                            lecturaCorrecta = false;
+                        }
                     }
-                    // Lee el número si existe
-                    if (lector.hasNextInt()) {
-                        derrotas = lector.nextInt();
-                    }
+                } catch (Exception e) {
+                    lecturaCorrecta = false;
+                    System.out.println("Error al leer el formato del archivo.");
                 }
                 lector.close();
             }
 
-            // 4. Actualizar contadores
-            if (haGanado) {
-                victorias++;
-                System.out.println("🎉 ¡Victoria registrada en las estadísticas! 🎉");
+            // 4. Actualizar contadores SOLO si la lectura fue correcta
+            if (lecturaCorrecta) {
+                if (haGanado) {
+                    victorias++;
+                    System.out.println("🎉 ¡Victoria registrada en las estadísticas! 🎉");
+                } else {
+                    derrotas++;
+                    System.out.println("💀 Derrota registrada en las estadísticas. 💀");
+                }
+
+                // 5. Escribir nuevos datos
+                // Usamos PrintWriter (es más cómodo que FileWriter)
+                PrintWriter escritor = new PrintWriter(archivo);
+                escritor.println("Victorias: " + victorias);
+                escritor.println("Derrotas: " + derrotas);
+                escritor.close();
+
+                // Mostrar resumen
+                System.out.println("--- ESTADÍSTICAS TOTALES ---");
+                System.out.println("🏆 Victorias: " + victorias);
+                System.out.println("❌ Derrotas: " + derrotas);
+                System.out.println("----------------------------");
             } else {
-                derrotas++;
-                System.out.println("💀 Derrota registrada en las estadísticas. 💀");
+                System.out
+                        .println("⚠️  AVISO: El archivo de estadísticas parece dañado o tiene un formato incorrecto.");
+                System.out.println("⚠️  No se han guardado los nuevos datos para evitar perder el progreso anterior.");
             }
-
-            // 5. Escribir nuevos datos
-            // Usamos PrintWriter (es más cómodo que FileWriter)
-            PrintWriter escritor = new PrintWriter(archivo);
-            escritor.println("Victorias: " + victorias);
-            escritor.println("Derrotas: " + derrotas);
-            escritor.close();
-
-            // Mostrar resumen
-            System.out.println("--- ESTADÍSTICAS TOTALES ---");
-            System.out.println("🏆 Victorias: " + victorias);
-            System.out.println("❌ Derrotas: " + derrotas);
-            System.out.println("----------------------------");
 
         } catch (IOException e) {
             System.out.println("Error al guardar estadísticas: " + e.getMessage());
