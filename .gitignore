@@ -7,3 +7,6 @@
 out/
 # Archivos de documentación generada
 javadoc/
+# Archivos opcionales
+src/Practica_yago*
+src/Estadisticas_yago*
