@@ -5,3 +5,5 @@
 # Archivos compilados (basura)
 *.class
 out/
+# Archivos de documentación generada
+javadoc/

@@ -267,7 +267,6 @@ public class InfortacticsUVa {
 
 
     // --- LÓGICA DEL JUEGO ---
-
     // Método del CASE 1:
     // Crear método auxiliar para cargar baraja enemiga aleatoria (Opción 1).
     /**
@@ -283,7 +282,7 @@ public class InfortacticsUVa {
         Methods.initializeDeck(enemyDeck);
         boolean hayPersonajes = false;
 
-        // Bucle WHile
+        // Bucle While
         int cont = 0;
         while (cont < playerDeck.length && !hayPersonajes){
             if (!playerDeck[cont].equals("")) {
