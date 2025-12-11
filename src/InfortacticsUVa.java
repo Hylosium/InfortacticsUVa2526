@@ -469,7 +469,7 @@ public class InfortacticsUVa {
 
         // Ruta relativa
         File carpeta = new File("Estadisticas");
-        File archivo = new File("Estadisticas/estadisticas.txt");
+        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
 
         try {
             // 1. Crear directorio si no existe
