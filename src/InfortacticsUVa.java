@@ -10,6 +10,13 @@ import java.util.Scanner;
  */
 public class InfortacticsUVa {
 
+    /*
+    Constantes de colores ANSI para distinguir jugador y oponente
+    */
+    static final String RESET = "\u001B[0m";
+    static final String BLUE = "\u001B[44m";
+    static final String RED  = "\u001B[41m";
+
     /**
      * Método principal de la aplicación.
      */
@@ -128,29 +135,36 @@ public class InfortacticsUVa {
                         if (fila == i && col == j) {
                             char letra = deck[k].charAt(0);
 
-                            // Traductor de Letra a Emoji
+                            //Ver si el emoji a imprimir es del jugador (azul) o del enemigo (rojo)
+                            String colorFondo = (k % 2 == 0) ? BLUE : RED;
+                            if (k % 2 == 0) {
+                                colorFondo = BLUE;  
+                            } else {
+                                colorFondo = RED;
+                            }
+                            
+                            //Traductor de letra a emoji
                             switch (letra) {
                                 case Assets.ARCHER_SYMBOL:
-                                    contenidoCelda = Assets.ARCHER_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.ARCHER_IMAGE + RESET;
                                     break;
                                 case Assets.DRAGON_SYMBOL:
-                                    contenidoCelda = Assets.DRAGON_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.DRAGON_IMAGE + RESET;
                                     break;
                                 case Assets.PRINCESS_SYMBOL:
-                                    contenidoCelda = Assets.PRINCESS_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.PRINCESS_IMAGE + RESET;
                                     break;
                                 case Assets.VALKYRIE_SYMBOL:
-                                    contenidoCelda = Assets.VALKYRIE_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.VALKYRIE_IMAGE + RESET;
                                     break;
                                 case Assets.GOBLIN_SYMBOL:
-                                    contenidoCelda = Assets.GOBLIN_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.GOBLIN_IMAGE + RESET;
                                     break;
                                 case Assets.PK_SYMBOL:
-                                    contenidoCelda = Assets.PK_IMAGE;
+                                    contenidoCelda = colorFondo + Assets.PK_IMAGE + RESET;
                                     break;
-                                default:
-                                    contenidoCelda = letra + "";
                             }
+
                         }
                     }
                 }
