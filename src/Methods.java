@@ -27,7 +27,7 @@ public class Methods {
 		createGameDeck(playerDeck, enemyDeck, gameDeck);
 
 		// Mostramos los personajes del juego
-		InfortacticsUVa.printBoard(gameDeck);
+		InfortacticsUVa.printBoard(gameDeck, true);
 
 		System.out.println("\n\nComienza la Partida.......\n");
 
@@ -72,7 +72,7 @@ public class Methods {
 				j++;
 			}
 
-			InfortacticsUVa.printBoard(gameDeck);
+			InfortacticsUVa.printBoard(gameDeck, true);
 
 			readEnter = in.nextLine();
 

@@ -64,7 +64,7 @@ public class InfortacticsUVa {
                 // --- OPCIÓN 5: SALIR ---
                 case "5":
                     System.out.println("Saliendo del programa ...");
-                    System.out.println("Gracias por jugar <3<3<3<3");
+                    System.out.println("Gracias por jugar ❤\uFE0F❤\uFE0F❤\uFE0F❤\uFE0F");
                     salir = true;
                     break;
 
@@ -104,10 +104,11 @@ public class InfortacticsUVa {
 
     /**
      * Dibuja por pantalla el estado actual del tablero.
-     * 
+     *
      * @param deck Vector de Strings que contiene las cartas a mostrar.
      */
-    public static void printBoard(String[] deck) {
+    // AÑADIMOS 'boolean esPartida' a los argumentos
+    public static void printBoard(String[] deck, boolean esPartida) {
         System.out.println("TABLERO");
         System.out.println("    0   1   2   3   4   5");
         System.out.println("  -------------------------");
@@ -136,13 +137,20 @@ public class InfortacticsUVa {
                             char letra = deck[k].charAt(0);
 
                             //Ver si el emoji a imprimir es del jugador (azul) o del enemigo (rojo)
-                            String colorFondo = (k % 2 == 0) ? BLUE : RED;
-                            if (k % 2 == 0) {
-                                colorFondo = BLUE;  
+                            String colorFondo; //= (k % 2 == 0) ? BLUE : RED;
+                            if (esPartida){
+                                // Durante la partida, imprimir según que tropas sean:
+                                // del jugador o del enemigo.
+                                if (k % 2 == 0) {
+                                    colorFondo = BLUE;
+                                } else {
+                                    colorFondo = RED;
+                                }
                             } else {
-                                colorFondo = RED;
+                                // Durante la selección de tropas: Siempre es el jugador (Azul)
+                                colorFondo = BLUE;
                             }
-                            
+
                             //Traductor de letra a emoji
                             switch (letra) {
                                 case Assets.ARCHER_SYMBOL:
@@ -276,7 +284,7 @@ public class InfortacticsUVa {
             if (!carpeta.exists())
                 carpeta.mkdir();
 
-            // Usamos PrintWriter como solicitado (más fácil para escribir strings)
+            // Usamos PrintWriter
             PrintWriter escribirFichero = new PrintWriter("Barajas/BarajaGuardada.txt");
 
             for (int i = 0; i < playerDeck.length; i++) {
@@ -392,7 +400,7 @@ public class InfortacticsUVa {
         boolean seguirEditando = true;
 
         do {
-            printBoard(deck);
+            printBoard(deck, false); // Añadimos false para que los colores sean AZULES.
             printStats();
             System.out.println("Elixir restante 💧: " + currentElixir);
 
@@ -587,8 +595,7 @@ public class InfortacticsUVa {
                 System.out.println("❌ Derrotas: " + derrotas);
                 System.out.println("----------------------------");
             } else {
-                System.out
-                        .println("⚠️  AVISO: El archivo de estadísticas parece dañado o tiene un formato incorrecto.");
+                System.out.println("⚠️  AVISO: El archivo de estadísticas parece dañado o tiene un formato incorrecto.");
                 System.out.println("⚠️  No se han guardado los nuevos datos para evitar perder el progreso anterior.");
             }
 
