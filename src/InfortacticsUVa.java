@@ -54,6 +54,7 @@ public class InfortacticsUVa {
             System.out.println("| 3. Guardar Baraja    |");
             System.out.println("| 4. Cargar Baraja     |");
             System.out.println("| 5. Salir             |");
+            System.out.println("| 6. Estadísticas      |");
             System.out.println(".______________________.");
 
             System.out.print("Opción: ");
@@ -61,6 +62,12 @@ public class InfortacticsUVa {
 
             // 2.2 LÓGICA DE OPCIONES
             switch (entrada) {
+                // --- OPCIÓN 6: MOSTRAR STATS:
+
+                case "6":
+                    mostrarEstadisticas();
+                    break;
+
                 // --- OPCIÓN 5: SALIR ---
                 case "5":
                     System.out.println("Saliendo del programa ...");
@@ -110,19 +117,41 @@ public class InfortacticsUVa {
     // AÑADIMOS 'boolean esPartida' a los argumentos
     public static void printBoard(String[] deck, boolean esPartida) {
         System.out.println("TABLERO");
-        System.out.println("    0   1   2   3   4   5");
-        System.out.println("  -------------------------");
+        //System.out.println("    0   1   2   3   4   5");
+        // Cambios en la CABCERA DE COLUMNA para que sea DINÁMICO.
+        // PRE: Alinear columnas
+        System.out.print("    ");
+        for (int j = 0; j < Assets.BOARD_COLUMNS; j++) {
+            // Ocupar 4 espacios.
+            // Alineados a la izquierda "%-4d", a la dereche sería "%4d"
+            System.out.printf("%-4d", j);   // 4 caracteres por columna
+        }
+        // Salto de línea necesario:
+        System.out.println();
+
+        //System.out.println("  -------------------------");
+        // Pre: Alinear con columnas:
+        System.out.print("  ");
+        for (int j = 0; j < Assets.BOARD_COLUMNS; j++){
+            System.out.print("----");
+        }
+        System.out.print("-");
+        // Salto de línea necesario:
+        System.out.println();
 
         for (int i = 0; i < Assets.BOARD_ROWS; i++) {
 
             // Fila de contenido
-            System.out.print(i + " |");
+            //System.out.print(i + " |");
+            System.out.printf("%-1d |", i);
+            //System.out.printf("%-3d |", i);
+
 
             for (int j = 0; j < Assets.BOARD_COLUMNS; j++) {
                 String contenidoCelda = " ";
 
                 // Zona enemiga (Sombreado)
-                if (i < 3) {
+                if (i < (Assets.BOARD_ROWS/2)) {
                     // Concatenamos comillas vacías para convertir char a String
                     contenidoCelda = Assets.NO_POSITION + "";
                 }
@@ -188,7 +217,14 @@ public class InfortacticsUVa {
             }
 
             System.out.println();
-            System.out.println("  -------------------------");
+            // System.out.println("  -------------------------");
+            // Pre: Alinear con columnas:
+            System.out.print("  ");
+            for (int j = 0; j < Assets.BOARD_COLUMNS; j++){
+                System.out.print("----");
+            }
+            System.out.print("-");
+            System.out.println();
         }
     }
 
@@ -362,10 +398,8 @@ public class InfortacticsUVa {
                     // --- INICIO DE LA PARTIDA ---
                     int resultado = Methods.startGame(in, playerDeck, enemyDeck);
 
-                    // Actualizar estadísticas si hubo un ganador (1: Jugador, 0: Enemigo)
-                    if (resultado != -1) {
-                        actualizarEstadisticas(resultado == 1);
-                    }
+                    // Actualizar estadísticas si hubo un ganador (1: Jugador, 0: Enemigo, -1: Empate técnico.)
+                    actualizarEstadisticas(resultado);
 
                     System.out.println("Presiona Intro para volver al menú...");
                     in.nextLine();
@@ -426,7 +460,7 @@ public class InfortacticsUVa {
                             int filaB = entradaPosBorrar.charAt(0) - '0';
                             int colB = entradaPosBorrar.charAt(1) - '0';
 
-                            if (filaB >= 3 && filaB <= 5 && colB >= 0 && colB <= 5) {
+                            if (filaB >= (Assets.BOARD_ROWS/2) && filaB <= (Assets.BOARD_ROWS-1) && colB >= 0 && colB <= ((Assets.BOARD_COLUMNS-1))) {
                                 boolean encontrado = false;
                                 for (int i = 0; i < deck.length && !encontrado; i++) {
                                     if (!deck[i].equals("") &&
@@ -467,7 +501,8 @@ public class InfortacticsUVa {
                                     int col = entradaPosPoner.charAt(1) - '0';
 
                                     if (fila >= 3 && fila <= 5 && col >= 0 && col <= 5) {
-
+                                        // Comprueba que no estás escribiendo una TROPA
+                                        // nueva encima de otra que ya existe.
                                         boolean ocupado = false;
                                         for (int i = 0; i < deck.length && !ocupado; i++) {
                                             if (!deck[i].equals("") &&
@@ -518,11 +553,13 @@ public class InfortacticsUVa {
      * Utiliza SCANNER en lugar de split/trim para cumplir con las restricciones
      * académicas.
      * 
-     * @param haGanado true si el jugador ganó, false si perdió.
+     * @param resultado nos indica si el jugador ha ganado, el enemigo ha ganado, o es un empte técnico.
+     *                  1: Ha ganado, 0: Derrota, -1: Empate.
      */
-    public static void actualizarEstadisticas(boolean haGanado) {
+    public static void actualizarEstadisticas(int resultado) {
         int victorias = 0;
-        int derrotas = 0;
+        int derrotas  = 0;
+        int empates   = 0;
         boolean lecturaCorrecta = true;
 
         // Ruta relativa
@@ -545,26 +582,27 @@ public class InfortacticsUVa {
                 Scanner lector = new Scanner(archivo);
 
                 try {
-                    // Leemos token a token esperando el formato "Victorias: X"
-                    if (lector.hasNext()) {
-                        lector.next(); // Ignoramos "Victorias:"
-                        if (lector.hasNextInt()) {
-                            victorias = lector.nextInt();
-                        } else {
-                            lecturaCorrecta = false;
-                        }
+                    // Leemos token a token esperando el formato "Etiqueta: X"
+                    while (lector.hasNext() && lecturaCorrecta) {
+                        String etiqueta = lector.next(); // "Victorias:" / "Derrotas:" / "Empates:" ...
 
-                        // Lee "Derrotas:" y lo ignoramos
-                        if (lector.hasNext()) {
-                            lector.next(); // Ignoramos "Derrotas:"
-                        }
-                        // Lee el número si existe
                         if (lector.hasNextInt()) {
-                            derrotas = lector.nextInt();
+                            int valor = lector.nextInt();
+
+                            if (etiqueta.equals("Victorias:")) {
+                                victorias = valor;
+                            } else if (etiqueta.equals("Derrotas:")) {
+                                derrotas = valor;
+                            } else if (etiqueta.equals("Empates:")) {
+                                empates = valor;
+                            }
+                            // Si es una etiqueta desconocida, la ignoras
                         } else {
+                            // Hay etiqueta pero no hay número detrás → formato malo
                             lecturaCorrecta = false;
                         }
                     }
+
                 } catch (Exception e) {
                     lecturaCorrecta = false;
                     System.out.println("Error al leer el formato del archivo.");
@@ -574,12 +612,15 @@ public class InfortacticsUVa {
 
             // 4. Actualizar contadores SOLO si la lectura fue correcta
             if (lecturaCorrecta) {
-                if (haGanado) {
+                if (resultado==1) {
                     victorias++;
                     System.out.println("🎉 ¡Victoria registrada en las estadísticas! 🎉");
-                } else {
+                } else if (resultado==0) {
                     derrotas++;
                     System.out.println("💀 Derrota registrada en las estadísticas. 💀");
+                } else if (resultado==-1) {
+                    empates++;
+                    System.out.println("😩 Empate registrado en las estadísticas. 😩");
                 }
 
                 // 5. Escribir nuevos datos
@@ -587,12 +628,14 @@ public class InfortacticsUVa {
                 PrintWriter escritor = new PrintWriter(archivo);
                 escritor.println("Victorias: " + victorias);
                 escritor.println("Derrotas: " + derrotas);
+                escritor.println("Empates: " + empates);
                 escritor.close();
 
                 // Mostrar resumen
                 System.out.println("--- ESTADÍSTICAS TOTALES ---");
                 System.out.println("🏆 Victorias: " + victorias);
                 System.out.println("❌ Derrotas: " + derrotas);
+                System.out.println("😩 Empates: " + empates);
                 System.out.println("----------------------------");
             } else {
                 System.out.println("⚠️  AVISO: El archivo de estadísticas parece dañado o tiene un formato incorrecto.");
@@ -603,4 +646,84 @@ public class InfortacticsUVa {
             System.out.println("Error al guardar estadísticas: " + e.getMessage());
         }
     }
+
+
+    /**
+     * Muestra las STATS
+     */
+    public static void mostrarEstadisticas() {
+        int victorias = 0;
+        int derrotas  = 0;
+        int empates   = 0;
+        boolean lecturaCorrecta = true;
+
+        // Ruta relativa
+        File carpeta = new File("Estadisticas");
+        File archivo = new File("Estadisticas/EstadisticasGuardadas.txt");
+
+        try {
+            // 1. Crear directorio si no existe
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+
+            // 2. Crear archivo si no existe
+            if (!archivo.exists()) {
+                if (archivo.createNewFile()) {
+                    System.out.println("Se ha creado el archivo de estadísticas nuevo.");
+                }
+            } else {
+                // 3. Leer estadísticas previas USANDO SCANNER
+                Scanner lector = new Scanner(archivo);
+
+                try {
+                    // Leemos token a token esperando el formato "Etiqueta: X"
+                    while (lector.hasNext() && lecturaCorrecta) {
+                        String etiqueta = lector.next(); // "Victorias:" / "Derrotas:" / "Empates:" ...
+
+                        if (lector.hasNextInt()) {
+                            int valor = lector.nextInt();
+
+                            if (etiqueta.equals("Victorias:")) {
+                                victorias = valor;
+                            } else if (etiqueta.equals("Derrotas:")) {
+                                derrotas = valor;
+                            } else if (etiqueta.equals("Empates:")) {
+                                empates = valor;
+                            }
+                            // Si es una etiqueta desconocida, la ignoras
+                        } else {
+                            // Hay etiqueta pero no hay número detrás → formato malo
+                            lecturaCorrecta = false;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    lecturaCorrecta = false;
+                    System.out.println("Error al leer el formato del archivo.");
+                }
+                lector.close();
+            }
+
+            // 4. Actualizar contadores SOLO si la lectura fue correcta
+            if (lecturaCorrecta) {
+                // Mostrar resumen
+                Methods.flushScreen();
+                System.out.println("--- ESTADÍSTICAS TOTALES ---");
+                System.out.println("🏆 Victorias: " + victorias);
+                System.out.println("❌ Derrotas: " + derrotas);
+                System.out.println("😩 Empates: " + empates);
+                System.out.println("----------------------------");
+                System.out.println();
+            } else {
+                System.out.println("⚠️  AVISO: El archivo de estadísticas parece dañado o tiene un formato incorrecto.");
+                System.out.println("⚠️  No se han guardado los nuevos datos para evitar perder el progreso anterior.");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error al guardar estadísticas: " + e.getMessage());
+        }
+    }
+
+
 }

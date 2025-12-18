@@ -1,0 +1,3 @@
+Victorias: 0
+Derrotas: 0
+Empates: 0
