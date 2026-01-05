@@ -1,5 +1,7 @@
 # InforTactics UVa
 
+<img src="./infortacticsUVA.png" width="600" height="600"/>
+
 ## Ejecución
 
 Ejecuta siempre desde la raíz del proyecto para evitar errores de archivos.
